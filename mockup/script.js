@@ -52,13 +52,11 @@ const saveSettingsBtn = document.getElementById('save-settings-btn');
 const cmsList = document.getElementById('cms-article-list');
 const addArticleBtn = document.getElementById('add-article-btn');
 const previewArea = document.getElementById('preview-area');
+
+// Palette Elements
+const blockTools = document.getElementById('block-tools');
 const saveBtn = document.getElementById('save-btn');
 const previewBtn = document.getElementById('preview-btn');
-
-// Modal Elements
-const sectionPickerModal = document.getElementById('section-picker-modal');
-const closeModalBtn = document.querySelector('.close-modal-btn');
-const sectionCards = document.querySelectorAll('.section-card');
 
 
 // --- Initialization ---
@@ -168,15 +166,20 @@ addArticleBtn.addEventListener('click', () => {
 // --- Builder Logic (Inline Editing) ---
 
 function renderBuilder() {
-    // Clear content but keep floating toolbar
-    const toolbar = previewArea.querySelector('.floating-toolbar');
+    // Clear content but keep palette (palette is fixed outside preview-area inner content flow, but inside the container)
+    // Actually, palette is inside preview-area in HTML, so we should preserve it or re-append it.
+    // Better to clear only sections.
+
+    // Let's clear everything and re-append palette if it was there, or just assume palette is fixed overlay.
+    // In current HTML structure, palette is inside preview-area.
+    const palette = document.getElementById('editor-palette');
     previewArea.innerHTML = '';
-    if (toolbar) previewArea.appendChild(toolbar);
+    if (palette) previewArea.appendChild(palette);
 
     if (sections.length === 0) {
         const placeholder = document.createElement('div');
         placeholder.className = 'preview-placeholder';
-        placeholder.innerHTML = '<p>下のボタンからセクションを追加してください</p>';
+        placeholder.innerHTML = '<p>下のパレットからセクションを追加してください</p>';
         previewArea.appendChild(placeholder);
     }
 
@@ -186,7 +189,7 @@ function renderBuilder() {
         sectionEl.onclick = (e) => {
             e.stopPropagation();
             activeSectionId = section.id;
-            renderBuilder(); // Re-render to show controls
+            renderBuilder(); // Re-render to show controls and update palette state
         };
 
         // Render content based on type
@@ -249,17 +252,7 @@ function renderBuilder() {
                     contentHtml += `</div>`;
                 });
 
-                // Add Block Area
-                contentHtml += `
-                    <div class="add-block-area">
-                        <div class="add-block-buttons">
-                            <button class="add-block-btn" onclick="addBlock('${section.id}', 'heading'); event.stopPropagation();"><i data-lucide="heading"></i> 見出し</button>
-                            <button class="add-block-btn" onclick="addBlock('${section.id}', 'text'); event.stopPropagation();"><i data-lucide="type"></i> テキスト</button>
-                            <button class="add-block-btn" onclick="addBlock('${section.id}', 'image'); event.stopPropagation();"><i data-lucide="image"></i> 画像</button>
-                            <button class="add-block-btn" onclick="addBlock('${section.id}', 'table'); event.stopPropagation();"><i data-lucide="table"></i> 表</button>
-                        </div>
-                    </div>
-                `;
+                // No inline add block buttons anymore
                 contentHtml += `</div>`;
                 break;
             case 'footer':
@@ -287,18 +280,23 @@ function renderBuilder() {
         previewArea.appendChild(sectionEl);
     });
 
-    // Append "Add Section" Button
-    const addSectionWrapper = document.createElement('div');
-    addSectionWrapper.className = 'add-section-wrapper';
-    addSectionWrapper.innerHTML = `
-        <button class="add-section-main-btn" onclick="openSectionPicker()">
-            <i data-lucide="plus-circle"></i> セクションを追加
-        </button>
-    `;
-    previewArea.appendChild(addSectionWrapper);
+    // Update Palette State
+    updatePaletteState();
 
     // Re-initialize icons after render
     lucide.createIcons();
+}
+
+function updatePaletteState() {
+    const blockTools = document.getElementById('block-tools');
+    if (!blockTools) return;
+
+    const activeSection = sections.find(s => s.id === activeSectionId);
+    if (activeSection && activeSection.type === 'general') {
+        blockTools.style.display = 'flex';
+    } else {
+        blockTools.style.display = 'none';
+    }
 }
 
 // --- Helper Functions ---
@@ -314,14 +312,6 @@ function escapeHtml(text) {
 }
 
 // --- Actions ---
-
-function openSectionPicker() {
-    sectionPickerModal.style.display = 'flex';
-}
-
-function closeSectionPicker() {
-    sectionPickerModal.style.display = 'none';
-}
 
 function addSection(type) {
     const newId = Date.now().toString();
@@ -339,7 +329,6 @@ function addSection(type) {
 
     sections.push({ id: newId, type, data });
     activeSectionId = newId;
-    closeSectionPicker();
     renderBuilder();
     setTimeout(() => {
         previewArea.scrollTop = previewArea.scrollHeight;
@@ -369,9 +358,16 @@ function updateImage(sectionId, key) {
 }
 
 // Block Actions
-function addBlock(sectionId, type) {
-    const section = sections.find(s => s.id === sectionId);
-    if (!section || section.type !== 'general') return;
+function addBlockToActive(type) {
+    if (!activeSectionId) {
+        alert('セクションを選択してください');
+        return;
+    }
+    const section = sections.find(s => s.id === activeSectionId);
+    if (!section || section.type !== 'general') {
+        alert('このセクションにはブロックを追加できません');
+        return;
+    }
 
     const newBlock = {
         id: Date.now().toString(),
@@ -451,18 +447,6 @@ function moveSection(id, direction) {
 }
 
 // --- Event Listeners ---
-
-// Modal Listeners
-closeModalBtn.addEventListener('click', closeSectionPicker);
-sectionPickerModal.addEventListener('click', (e) => {
-    if (e.target === sectionPickerModal) closeSectionPicker();
-});
-
-sectionCards.forEach(card => {
-    card.addEventListener('click', () => {
-        addSection(card.dataset.type);
-    });
-});
 
 saveBtn.addEventListener('click', () => {
     console.log('Saved JSON:', JSON.stringify(sections, null, 2));

@@ -38,7 +38,6 @@
                     <div class="icon-container"><i data-lucide="settings"></i></div>
                     <span class="label">グローバル設定</span>
                 </li>
-
                 <!-- Spacer -->
                 <li class="sidebar-spacer"></li>
 
@@ -88,14 +87,6 @@
                     <div class="builder-body">
                         <!-- Preview Area (Full Width) -->
                         <div class="preview-area" id="preview-area">
-                            <!-- Floating Toolbar -->
-                            <div class="floating-toolbar">
-                                <button id="preview-btn" class="btn secondary" title="プレビュー確認"><i
-                                        data-lucide="eye"></i></button>
-                                <button id="save-btn" class="btn primary" title="サイトを保存"><i data-lucide="save"></i>
-                                    保存</button>
-                            </div>
-
                             <div class="preview-placeholder">
                                 <p>下のボタンからセクションを追加してください</p>
                             </div>
@@ -103,34 +94,52 @@
 
                             <!-- Add Section Button (Appended via JS) -->
                         </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Section Picker Modal -->
-            <div id="section-picker-modal" class="modal-overlay" style="display: none;">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3>セクションを追加</h3>
-                        <button class="close-modal-btn"><i data-lucide="x"></i></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="section-grid">
-                            <div class="section-card" data-type="header">
-                                <div class="icon"><i data-lucide="navigation"></i></div>
-                                <span>ヘッダー</span>
+                        <!-- Editor Palette (Fixed Bottom) -->
+                        <div class="editor-palette" id="editor-palette">
+                            <!-- Section Tools -->
+                            <div class="palette-group section-tools">
+                                <div class="palette-item" onclick="addSection('header')" data-tooltip="ヘッダー追加">
+                                    <i data-lucide="layout-template"></i>
+                                </div>
+                                <div class="palette-item" onclick="addSection('hero')" data-tooltip="ヒーロー追加">
+                                    <i data-lucide="image"></i>
+                                </div>
+                                <div class="palette-item" onclick="addSection('general')" data-tooltip="一般セクション追加">
+                                    <i data-lucide="box"></i>
+                                </div>
+                                <div class="palette-item" onclick="addSection('footer')" data-tooltip="フッター追加">
+                                    <i data-lucide="layout-bottom"></i>
+                                </div>
                             </div>
-                            <div class="section-card" data-type="hero">
-                                <div class="icon"><i data-lucide="image"></i></div>
-                                <span>ヒーロー</span>
+
+                            <div class="palette-separator"></div>
+
+                            <!-- Block Tools (Context Aware) -->
+                            <div class="palette-group block-tools" id="block-tools" style="display: none;">
+                                <div class="palette-item" onclick="addBlockToActive('heading')" data-tooltip="見出し追加">
+                                    <i data-lucide="heading"></i>
+                                </div>
+                                <div class="palette-item" onclick="addBlockToActive('text')" data-tooltip="テキスト追加">
+                                    <i data-lucide="type"></i>
+                                </div>
+                                <div class="palette-item" onclick="addBlockToActive('image')" data-tooltip="画像追加">
+                                    <i data-lucide="image-plus"></i>
+                                </div>
+                                <div class="palette-item" onclick="addBlockToActive('table')" data-tooltip="表追加">
+                                    <i data-lucide="table"></i>
+                                </div>
+                                <div class="palette-separator"></div>
                             </div>
-                            <div class="section-card" data-type="general">
-                                <div class="icon"><i data-lucide="box"></i></div>
-                                <span>汎用セクション</span>
-                            </div>
-                            <div class="section-card" data-type="footer">
-                                <div class="icon"><i data-lucide="footprints"></i></div>
-                                <span>フッター</span>
+
+                            <!-- Action Tools -->
+                            <div class="palette-group action-tools">
+                                <div class="palette-item" id="preview-btn" data-tooltip="プレビュー">
+                                    <i data-lucide="eye"></i>
+                                </div>
+                                <div class="palette-item primary" id="save-btn" data-tooltip="保存">
+                                    <i data-lucide="save"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
