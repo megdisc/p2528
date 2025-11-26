@@ -188,8 +188,10 @@ function renderBuilder() {
         sectionEl.className = `preview-section ${section.id === activeSectionId ? 'active' : ''}`;
         sectionEl.onclick = (e) => {
             e.stopPropagation();
-            activeSectionId = section.id;
-            renderBuilder(); // Re-render to show controls and update palette state
+            if (activeSectionId !== section.id) {
+                activeSectionId = section.id;
+                renderBuilder(); // Re-render only if section changes
+            }
         };
 
         // Render content based on type
