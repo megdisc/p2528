@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SiteBuilder Pro - Production Mockup</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-shell">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">SiteBuilder Pro</div>
+            </div>
+            <ul class="nav-links">
+                <li class="nav-item active" data-view="dashboard">
+                    <span class="icon">📊</span> ダッシュボード
+                </li>
+                <li class="nav-item" data-view="builder">
+                    <span class="icon">🎨</span> サイトビルダー
+                </li>
+                <li class="nav-item" data-view="cms">
+                    <span class="icon">📝</span> CMS / ブログ
+                </li>
+                <li class="nav-item" data-view="settings">
+                    <span class="icon">⚙️</span> グローバル設定
+                </li>
+            </ul>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">AD</div>
+                    <div class="user-info">
+                        <span class="name">Admin User</span>
+                        <span class="role">管理者</span>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+
+            <!-- View: Dashboard -->
+            <div id="view-dashboard" class="view-container active">
+                <header class="view-header">
+                    <h2>ダッシュボード</h2>
+                </header>
+                <div class="dashboard-grid">
+                    <div class="card stat-card">
+                        <h3>総アクセス数</h3>
+                        <div class="stat-value">12,345</div>
+                        <div class="stat-trend up">↗ 12% 先月比</div>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>問い合わせ</h3>
+                        <div class="stat-value">48</div>
+                        <div class="stat-trend up">↗ 5% 先月比</div>
+                    </div>
+                    <div class="card stat-card">
+                        <h3>記事数</h3>
+                        <div class="stat-value">15</div>
+                        <div class="stat-trend">ー</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: Builder (Original Mockup Content) -->
+            <div id="view-builder" class="view-container" style="display: none;">
+                <div class="builder-layout">
+                    <header class="builder-header">
+                        <div class="actions">
+                            <button id="preview-btn" class="btn secondary">プレビュー確認</button>
+                            <button id="save-btn" class="btn primary">サイトを保存</button>
+                        </div>
+                    </header>
+                    <div class="builder-body">
+                        <!-- Sidebar / Toolbox -->
+                        <aside class="toolbox">
+                            <h3>セクション追加</h3>
+                            <div class="tool-item" data-type="hero">
+                                <span class="icon">🖼️</span> ヒーロー
+                            </div>
+                            <div class="tool-item" data-type="features">
+                                <span class="icon">✨</span> 特徴リスト
+                            </div>
+                            <div class="tool-item" data-type="text">
+                                <span class="icon">📝</span> テキスト
+                            </div>
+                            <div class="tool-item" data-type="form">
+                                <span class="icon">✉️</span> フォーム
+                            </div>
+                        </aside>
+
+                        <!-- Preview Area (Left) -->
+                        <div class="preview-area" id="preview-area">
+                            <div class="preview-placeholder">
+                                <p>左のツールボックスからセクションを追加してください</p>
+                            </div>
+                            <!-- Sections will be rendered here -->
+                        </div>
+
+                        <!-- Editor Panel (Right) -->
+                        <aside class="editor-panel" id="editor-panel">
+                            <div class="editor-header">
+                                <h3>プロパティ設定</h3>
+                                <span id="active-section-name" class="sub-text">選択なし</span>
+                            </div>
+                            <div id="editor-content" class="editor-content">
+                                <p class="empty-state">プレビューエリアのセクションを選択して編集します。</p>
+                            </div>
+                        </aside>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View: CMS -->
+            <div id="view-cms" class="view-container" style="display: none;">
+                <header class="view-header">
+                    <h2>記事管理</h2>
+                    <button class="btn primary" id="add-article-btn">新規記事作成</button>
+                </header>
+                <div class="cms-content">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>タイトル</th>
+                                <th>ステータス</th>
+                                <th>公開日</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cms-article-list">
+                            <!-- Articles will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- View: Settings -->
+            <div id="view-settings" class="view-container" style="display: none;">
+                <header class="view-header">
+                    <h2>グローバル設定</h2>
+                    <button class="btn primary" id="save-settings-btn">設定を保存</button>
+                </header>
+                <div class="settings-content">
+                    <div class="card">
+                        <h3>デザインシステム</h3>
+                        <div class="form-group">
+                            <label>プライマリカラー</label>
+                            <div class="color-picker-wrapper">
+                                <input type="color" id="setting-primary-color" value="#2563eb">
+                                <span id="primary-color-value">#2563eb</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>フォント</label>
+                            <select class="form-control" id="setting-font">
+                                <option value="Inter">Inter (モダン)</option>
+                                <option value="serif">Serif (明朝体)</option>
+                                <option value="monospace">Monospace (等幅)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
