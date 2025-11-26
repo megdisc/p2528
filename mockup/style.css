@@ -103,14 +103,14 @@ body {
     color: inherit;
 }
 
-height: 20px;
-}
+
 
 .label {
     opacity: 0;
     transition: opacity 0.2s ease 0.1s;
     /* Delay fade in */
-    padding-right: 1.5rem;
+    /* Delay fade in */
+    padding-right: 2rem;
     font-size: 0.875rem;
     font-weight: 500;
 }
