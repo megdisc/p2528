@@ -69,6 +69,9 @@ function init() {
     renderCMS();
     renderBuilder();
     lucide.createIcons();
+
+    // Show initial view
+    switchView('dashboard');
 }
 
 // --- Navigation Logic ---
@@ -83,7 +86,11 @@ function setupNavigation() {
 }
 
 function switchView(viewName) {
+    if (currentView === viewName && document.getElementById(`view-${viewName}`).classList.contains('active-view')) return;
+
     currentView = viewName;
+
+    // Update Sidebar Active State
     sidebarItems.forEach(item => {
         if (item.dataset.view === viewName) {
             item.classList.add('active');
@@ -91,10 +98,16 @@ function switchView(viewName) {
             item.classList.remove('active');
         }
     });
+
+    // Handle View Transition
     viewContainers.forEach(container => {
         if (container.id === `view-${viewName}`) {
             container.style.display = 'flex';
+            // Trigger reflow to enable transition
+            void container.offsetWidth;
+            container.classList.add('active-view');
         } else {
+            container.classList.remove('active-view');
             container.style.display = 'none';
         }
     });
