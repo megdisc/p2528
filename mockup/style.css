@@ -96,9 +96,14 @@ body {
     flex-shrink: 0;
 }
 
-.icon-container i {
+.icon-container i,
+.icon-container svg {
     width: 20px;
     height: 20px;
+    color: inherit;
+}
+
+height: 20px;
 }
 
 .label {
@@ -592,6 +597,120 @@ img.editable-image:hover {
 .comp-general {
     padding: 4rem 2rem;
     background-color: white;
+}
+
+/* Component Styles */
+.comp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.comp-header .logo {
+    font-weight: bold;
+    font-size: 1.25rem;
+    color: var(--primary-color);
+}
+
+.comp-header nav {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.comp-header nav a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-weight: 500;
+}
+
+.comp-hero {
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    padding: 2rem;
+}
+
+.comp-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.comp-hero p {
+    font-size: 1.125rem;
+    color: #4b5563;
+    margin-bottom: 2rem;
+    max-width: 600px;
+}
+
+.comp-hero .cta-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background-color 0.2s;
+}
+
+.comp-hero .cta-button:hover {
+    background-color: var(--primary-hover);
+}
+
+.comp-footer {
+    padding: 3rem 2rem;
+    background-color: #1f2937;
+    color: white;
+    text-align: center;
+}
+
+.comp-footer .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.comp-footer .footer-links a {
+    color: #9ca3af;
+    text-decoration: none;
+}
+
+.comp-footer .footer-links a:hover {
+    color: white;
+}
+
+.comp-footer .copyright {
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.block-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.block-table th,
+.block-table td {
+    border: 1px solid #e5e7eb;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.block-table th {
+    background-color: #f9fafb;
+    font-weight: 600;
 }
 
 .block-item {

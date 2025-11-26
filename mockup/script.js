@@ -18,6 +18,14 @@ let cmsArticles = [
 let sections = [
     {
         id: '1',
+        type: 'header',
+        data: {
+            logoText: '函 Hako',
+            navItems: ['ホーム', '機能', '料金', 'お問い合わせ']
+        }
+    },
+    {
+        id: '2',
         type: 'hero',
         data: {
             title: 'あなたのビジネスを加速させる',
@@ -27,14 +35,41 @@ let sections = [
         }
     },
     {
-        id: '2',
+        id: '3',
         type: 'general',
         data: {
             blocks: [
-                { id: 'b1', type: 'heading', content: '主な機能' },
-                { id: 'b2', type: 'text', content: '私たちのプラットフォームは、ビジネスの成長を支援するために設計されています。' },
-                { id: 'b3', type: 'image', content: 'https://via.placeholder.com/800x400' }
+                { id: 'b1', type: 'heading', content: 'サービスの特徴' },
+                { id: 'b2', type: 'text', content: '私たちは、お客様のビジネス課題を解決するための革新的なソリューションを提供します。' },
+                { id: 'b3', type: 'image', content: 'https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=800&q=80' }
             ]
+        }
+    },
+    {
+        id: '4',
+        type: 'general',
+        data: {
+            blocks: [
+                { id: 'b4', type: 'heading', content: '会社概要' },
+                {
+                    id: 'b5', type: 'table', content: {
+                        headers: ['項目', '内容'],
+                        rows: [
+                            ['会社名', '株式会社Hako'],
+                            ['設立', '2024年4月1日'],
+                            ['代表者', '山田 太郎'],
+                            ['所在地', '東京都渋谷区...']
+                        ]
+                    }
+                }
+            ]
+        }
+    },
+    {
+        id: '5',
+        type: 'footer',
+        data: {
+            copyright: '© 2024 Hako Inc. All rights reserved.'
         }
     }
 ];
@@ -202,7 +237,7 @@ function renderBuilder() {
                     <header class="comp-header">
                         <div class="logo" contenteditable="true" onblur="updateSectionData('${section.id}', 'logoText', this.innerText)">${escapeHtml(section.data.logoText)}</div>
                         <nav>
-                            ${section.data.links.map((link, i) => `<a href="#" contenteditable="true" onblur="updateSectionData('${section.id}', 'links.${i}', this.innerText)">${escapeHtml(link)}</a>`).join('')}
+                            ${(section.data.navItems || []).map((link, i) => `<a href="#" contenteditable="true" onblur="updateSectionData('${section.id}', 'navItems.${i}', this.innerText)">${escapeHtml(link)}</a>`).join('')}
                         </nav>
                     </header>
                 `;
@@ -261,9 +296,9 @@ function renderBuilder() {
                 contentHtml = `
                     <footer class="comp-footer">
                         <div class="footer-links">
-                            ${section.data.links.map((link, i) => `<a href="#" contenteditable="true" onblur="updateSectionData('${section.id}', 'links.${i}', this.innerText)">${escapeHtml(link)}</a>`).join('')}
+                            ${(section.data.links || []).map((link, i) => `<a href="#" contenteditable="true" onblur="updateSectionData('${section.id}', 'links.${i}', this.innerText)">${escapeHtml(link)}</a>`).join('')}
                         </div>
-                        <p contenteditable="true" onblur="updateSectionData('${section.id}', 'copyright', this.innerText)">${escapeHtml(section.data.copyright)}</p>
+                        <div class="copyright" contenteditable="true" onblur="updateSectionData('${section.id}', 'copyright', this.innerText)">${escapeHtml(section.data.copyright || '')}</div>
                     </footer>
                 `;
                 break;
