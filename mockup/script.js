@@ -51,8 +51,13 @@ const saveSettingsBtn = document.getElementById('save-settings-btn');
 const cmsList = document.getElementById('cms-article-list');
 const addArticleBtn = document.getElementById('add-article-btn');
 const previewArea = document.getElementById('preview-area');
-const toolItems = document.querySelectorAll('.tool-item');
 const saveBtn = document.getElementById('save-btn');
+const previewBtn = document.getElementById('preview-btn');
+
+// Modal Elements
+const sectionPickerModal = document.getElementById('section-picker-modal');
+const closeModalBtn = document.querySelector('.close-modal-btn');
+const sectionCards = document.querySelectorAll('.section-card');
 
 
 // --- Initialization ---
@@ -149,12 +154,17 @@ addArticleBtn.addEventListener('click', () => {
 // --- Builder Logic (Inline Editing) ---
 
 function renderBuilder() {
-    if (sections.length === 0) {
-        previewArea.innerHTML = '<div class="preview-placeholder"><p>左のツールボックスからセクションを追加してください</p></div>';
-        return;
-    }
-
+    // Clear content but keep floating toolbar
+    const toolbar = previewArea.querySelector('.floating-toolbar');
     previewArea.innerHTML = '';
+    if (toolbar) previewArea.appendChild(toolbar);
+
+    if (sections.length === 0) {
+        const placeholder = document.createElement('div');
+        placeholder.className = 'preview-placeholder';
+        placeholder.innerHTML = '<p>下のボタンからセクションを追加してください</p>';
+        previewArea.appendChild(placeholder);
+    }
 
     sections.forEach((section, index) => {
         const sectionEl = document.createElement('div');
@@ -263,6 +273,16 @@ function renderBuilder() {
         previewArea.appendChild(sectionEl);
     });
 
+    // Append "Add Section" Button
+    const addSectionWrapper = document.createElement('div');
+    addSectionWrapper.className = 'add-section-wrapper';
+    addSectionWrapper.innerHTML = `
+        <button class="add-section-main-btn" onclick="openSectionPicker()">
+            <i data-lucide="plus-circle"></i> セクションを追加
+        </button>
+    `;
+    previewArea.appendChild(addSectionWrapper);
+
     // Re-initialize icons after render
     lucide.createIcons();
 }
@@ -281,6 +301,14 @@ function escapeHtml(text) {
 
 // --- Actions ---
 
+function openSectionPicker() {
+    sectionPickerModal.style.display = 'flex';
+}
+
+function closeSectionPicker() {
+    sectionPickerModal.style.display = 'none';
+}
+
 function addSection(type) {
     const newId = Date.now().toString();
     let data = {};
@@ -297,6 +325,7 @@ function addSection(type) {
 
     sections.push({ id: newId, type, data });
     activeSectionId = newId;
+    closeSectionPicker();
     renderBuilder();
     setTimeout(() => {
         previewArea.scrollTop = previewArea.scrollHeight;
@@ -315,7 +344,6 @@ function updateSectionData(sectionId, key, value) {
     } else {
         section.data[key] = value;
     }
-    // No need to re-render for text updates as it's inline
 }
 
 function updateImage(sectionId, key) {
@@ -410,9 +438,15 @@ function moveSection(id, direction) {
 
 // --- Event Listeners ---
 
-toolItems.forEach(item => {
-    item.addEventListener('click', () => {
-        addSection(item.dataset.type);
+// Modal Listeners
+closeModalBtn.addEventListener('click', closeSectionPicker);
+sectionPickerModal.addEventListener('click', (e) => {
+    if (e.target === sectionPickerModal) closeSectionPicker();
+});
+
+sectionCards.forEach(card => {
+    card.addEventListener('click', () => {
+        addSection(card.dataset.type);
     });
 });
 
