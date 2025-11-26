@@ -42,7 +42,8 @@ let activeSectionId = null;
 
 // --- DOM Elements ---
 
-const navItems = document.querySelectorAll('.nav-item');
+// Updated selector for sidebar items
+const sidebarItems = document.querySelectorAll('.sidebar-item[data-view]');
 const viewContainers = document.querySelectorAll('.view-container');
 const primaryColorInput = document.getElementById('setting-primary-color');
 const primaryColorValue = document.getElementById('primary-color-value');
@@ -73,17 +74,17 @@ function init() {
 // --- Navigation Logic ---
 
 function setupNavigation() {
-    navItems.forEach(item => {
+    sidebarItems.forEach(item => {
         item.addEventListener('click', () => {
             const view = item.dataset.view;
-            switchView(view);
+            if (view) switchView(view);
         });
     });
 }
 
 function switchView(viewName) {
     currentView = viewName;
-    navItems.forEach(item => {
+    sidebarItems.forEach(item => {
         if (item.dataset.view === viewName) {
             item.classList.add('active');
         } else {

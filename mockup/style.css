@@ -6,7 +6,8 @@
     --border-color: #e5e7eb;
     --text-main: #1f2937;
     --text-sub: #6b7280;
-    --sidebar-width: 260px;
+    --sidebar-width: 64px;
+    /* Collapsed width */
     --header-height: 60px;
 }
 
@@ -26,99 +27,138 @@ body {
 
 /* App Shell */
 .app-shell {
-    display: flex;
+    display: block;
+    /* Changed from flex to block for fixed sidebar */
     height: 100vh;
 }
 
 /* Sidebar */
 .sidebar {
-    width: var(--sidebar-width);
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: auto;
+    /* Allow content to define width up to max-width */
+    max-width: var(--sidebar-width);
+    /* Collapsed width */
     background-color: #111827;
-    /* Dark sidebar */
     color: white;
+    z-index: 1000;
+    transition: max-width 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    /* "Nyuru-tto" ease */
+    overflow: hidden;
+    white-space: nowrap;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar:hover {
+    max-width: 300px;
+    /* Expand to fit content */
+}
+
+.sidebar-list {
+    list-style: none;
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
+    height: 100%;
+    padding: 0.5rem 0;
 }
 
-.sidebar-header {
-    height: var(--header-height);
+.sidebar-item {
     display: flex;
     align-items: center;
-    padding: 0 1.5rem;
-    border-bottom: 1px solid #374151;
-}
-
-.sidebar-header .logo {
-    font-weight: 700;
-    font-size: 1.125rem;
-    color: white;
-}
-
-.nav-links {
-    list-style: none;
-    padding: 1rem 0;
-    flex: 1;
-}
-
-.nav-item {
-    padding: 0.75rem 1.5rem;
+    padding: 0;
     cursor: pointer;
-    display: flex;
-    align-items: center;
     color: #9ca3af;
     transition: all 0.2s;
+    height: 48px;
+    /* Fixed height for items */
+    margin-bottom: 0.25rem;
 }
 
-.nav-item:hover {
+.sidebar-item:hover {
     background-color: #1f2937;
     color: white;
 }
 
-.nav-item.active {
+.sidebar-item.active {
     background-color: var(--primary-color);
     color: white;
 }
 
-.nav-item .icon {
-    margin-right: 0.75rem;
-    width: 20px;
-    height: 20px;
+.icon-container {
+    width: var(--sidebar-width);
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 
-.sidebar-footer {
-    padding: 1rem;
-    border-top: 1px solid #374151;
+.icon-container i {
+    width: 20px;
+    height: 20px;
 }
 
-.user-profile {
-    display: flex;
-    align-items: center;
+.label {
+    opacity: 0;
+    transition: opacity 0.2s ease 0.1s;
+    /* Delay fade in */
+    padding-right: 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.sidebar:hover .label {
+    opacity: 1;
+}
+
+/* Logo Item Specifics */
+.logo-item {
+    margin-bottom: 1rem;
+    color: white;
+}
+
+.logo-icon {
+    font-weight: 700;
+    font-size: 1.25rem;
+}
+
+/* User Item Specifics */
+.user-item {
+    margin-top: auto;
+    /* Push to bottom if using flex column */
+}
+
+.sidebar-spacer {
+    flex: 1;
 }
 
 .avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     background-color: #374151;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.875rem;
-    margin-right: 0.75rem;
+    font-size: 0.75rem;
+    color: white;
+    margin: auto;
+    /* Center in container */
 }
 
 .user-info {
     display: flex;
     flex-direction: column;
+    line-height: 1.2;
 }
 
 .user-info .name {
     font-size: 0.875rem;
     font-weight: 500;
+    color: white;
 }
 
 .user-info .role {
@@ -128,10 +168,14 @@ body {
 
 /* Main Content */
 .main-content {
-    flex: 1;
+    margin-left: var(--sidebar-width);
+    /* Fixed margin */
+    height: 100vh;
     overflow: hidden;
     position: relative;
     background-color: var(--bg-color);
+    width: calc(100% - var(--sidebar-width));
+    /* Ensure full width minus sidebar */
 }
 
 .view-container {

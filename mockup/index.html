@@ -14,32 +14,43 @@
     <div class="app-shell">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">函</div>
-            </div>
-            <ul class="nav-links">
-                <li class="nav-item active" data-view="dashboard">
-                    <span class="icon"><i data-lucide="layout-dashboard"></i></span> ダッシュボード
+            <ul class="sidebar-list">
+                <!-- Logo Item -->
+                <li class="sidebar-item logo-item">
+                    <div class="icon-container logo-icon">函</div>
+                    <span class="label">Hako</span>
                 </li>
-                <li class="nav-item" data-view="builder">
-                    <span class="icon"><i data-lucide="palette"></i></span> サイトビルダー
+
+                <!-- Nav Items -->
+                <li class="sidebar-item active" data-view="dashboard">
+                    <div class="icon-container"><i data-lucide="layout-dashboard"></i></div>
+                    <span class="label">ダッシュボード</span>
                 </li>
-                <li class="nav-item" data-view="cms">
-                    <span class="icon"><i data-lucide="file-text"></i></span> CMS / ブログ
+                <li class="sidebar-item" data-view="builder">
+                    <div class="icon-container"><i data-lucide="palette"></i></div>
+                    <span class="label">サイトビルダー</span>
                 </li>
-                <li class="nav-item" data-view="settings">
-                    <span class="icon"><i data-lucide="settings"></i></span> グローバル設定
+                <li class="sidebar-item" data-view="cms">
+                    <div class="icon-container"><i data-lucide="file-text"></i></div>
+                    <span class="label">CMS / ブログ</span>
                 </li>
-            </ul>
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="avatar">AD</div>
-                    <div class="user-info">
-                        <span class="name">Admin User</span>
+                <li class="sidebar-item" data-view="settings">
+                    <div class="icon-container"><i data-lucide="settings"></i></div>
+                    <span class="label">グローバル設定</span>
+                </li>
+
+                <!-- Spacer -->
+                <li class="sidebar-spacer"></li>
+
+                <!-- User Profile Item -->
+                <li class="sidebar-item user-item">
+                    <div class="icon-container avatar">め</div>
+                    <div class="label user-info">
+                        <span class="name">めぐみ</span>
                         <span class="role">管理者</span>
                     </div>
-                </div>
-            </div>
+                </li>
+            </ul>
         </nav>
 
         <!-- Main Content Area -->
