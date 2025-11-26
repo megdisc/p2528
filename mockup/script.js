@@ -292,11 +292,17 @@ function updatePaletteState() {
     if (!blockTools) return;
 
     const activeSection = sections.find(s => s.id === activeSectionId);
-    if (activeSection && activeSection.type === 'general') {
-        blockTools.style.display = 'flex';
-    } else {
-        blockTools.style.display = 'none';
-    }
+    const isGeneral = activeSection && activeSection.type === 'general';
+
+    // Toggle disabled state for all items in block-tools
+    const items = blockTools.querySelectorAll('.palette-item');
+    items.forEach(item => {
+        if (isGeneral) {
+            item.classList.remove('disabled');
+        } else {
+            item.classList.add('disabled');
+        }
+    });
 }
 
 // --- Helper Functions ---

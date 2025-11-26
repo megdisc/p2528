@@ -417,6 +417,12 @@ body {
     background-color: var(--primary-hover);
 }
 
+.palette-item.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+    filter: grayscale(100%);
+}
+
 /* Tooltip */
 .palette-item::after {
     content: attr(data-tooltip);
