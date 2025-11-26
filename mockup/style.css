@@ -433,74 +433,115 @@ body {
     color: #ef4444;
 }
 
-/* Editor Panel (Right) */
-.editor-panel {
-    width: 320px;
-    background-color: var(--panel-bg);
-    border-left: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
+/* Inline Editing Styles */
+[contenteditable="true"] {
+    outline: 1px dashed transparent;
+    transition: outline-color 0.2s;
+    min-width: 10px;
+    /* Ensure empty fields are clickable */
 }
 
-.editor-header {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border-color);
+[contenteditable="true"]:hover {
+    outline-color: #93c5fd;
+    cursor: text;
 }
 
-.editor-header h3 {
-    font-size: 1rem;
-    font-weight: 600;
+[contenteditable="true"]:focus {
+    outline: 2px solid var(--primary-color);
+    background-color: rgba(37, 99, 235, 0.05);
+    border-radius: 2px;
 }
 
-.sub-text {
-    font-size: 0.75rem;
-    color: var(--text-sub);
+/* Image Editing */
+img.editable-image {
+    cursor: pointer;
+    transition: opacity 0.2s;
 }
 
-.editor-content {
-    padding: 1rem;
-    overflow-y: auto;
-    flex: 1;
+img.editable-image:hover {
+    opacity: 0.8;
+    outline: 2px solid var(--primary-color);
 }
 
-.empty-state {
-    color: var(--text-sub);
-    font-size: 0.875rem;
-    text-align: center;
-    margin-top: 2rem;
-}
-
-/* Form Elements */
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-    color: var(--text-sub);
-}
-
-.form-control {
-    width: 100%;
+/* Block Controls (In-Context) */
+.block-item {
+    position: relative;
     padding: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+}
+
+.block-item:hover {
+    border-color: #e5e7eb;
+}
+
+.block-controls {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    display: none;
+    background: white;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 0.875rem;
-    font-family: inherit;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
-.form-control:focus {
-    outline: none;
+.block-item:hover .block-controls {
+    display: flex;
+}
+
+.block-control-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+    cursor: pointer;
+    border-right: 1px solid var(--border-color);
+}
+
+.block-control-btn:last-child {
+    border-right: none;
+}
+
+.block-control-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.add-block-area {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 2px dashed #e5e7eb;
+    border-radius: 6px;
+    text-align: center;
+    transition: border-color 0.2s;
+}
+
+.add-block-area:hover {
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
 }
 
-textarea.form-control {
-    resize: vertical;
-    min-height: 80px;
+.add-block-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.add-block-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.add-block-btn:hover {
+    background-color: #f9fafb;
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 /* --- General Section & Blocks --- */
@@ -555,62 +596,7 @@ textarea.form-control {
     font-weight: 600;
 }
 
-/* Block Editor UI */
-.block-manager {
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 0.5rem;
-    background-color: #f9fafb;
-    margin-bottom: 1rem;
-}
-
-.block-list-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.5rem;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    margin-bottom: 0.5rem;
-    cursor: pointer;
-}
-
-.block-list-item:hover {
-    border-color: var(--primary-color);
-}
-
-.block-list-item.selected {
-    border-color: var(--primary-color);
-    background-color: #eff6ff;
-}
-
-.block-type-label {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-sub);
-}
-
-.add-block-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.add-block-btn {
-    padding: 0.5rem;
-    font-size: 0.75rem;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.add-block-btn:hover {
-    background-color: var(--bg-color);
-    border-color: var(--text-sub);
-}
+/* Block Editor UI - REMOVED */
 
 /* --- Legacy Sections (Header/Footer/Hero) --- */
 

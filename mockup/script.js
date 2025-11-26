@@ -39,29 +39,18 @@ let sections = [
     }
 ];
 let activeSectionId = null;
-let activeBlockId = null; // For block editing
 
 // --- DOM Elements ---
 
-// Navigation
 const navItems = document.querySelectorAll('.nav-item');
 const viewContainers = document.querySelectorAll('.view-container');
-
-// Settings
 const primaryColorInput = document.getElementById('setting-primary-color');
 const primaryColorValue = document.getElementById('primary-color-value');
 const fontSelect = document.getElementById('setting-font');
 const saveSettingsBtn = document.getElementById('save-settings-btn');
-
-// CMS
 const cmsList = document.getElementById('cms-article-list');
 const addArticleBtn = document.getElementById('add-article-btn');
-
-// Builder
 const previewArea = document.getElementById('preview-area');
-const editorPanel = document.getElementById('editor-panel');
-const editorContent = document.getElementById('editor-content');
-const activeSectionName = document.getElementById('active-section-name');
 const toolItems = document.querySelectorAll('.tool-item');
 const saveBtn = document.getElementById('save-btn');
 
@@ -73,7 +62,6 @@ function init() {
     setupSettings();
     renderCMS();
     renderBuilder();
-    renderBuilderEditor();
     lucide.createIcons();
 }
 
@@ -90,8 +78,6 @@ function setupNavigation() {
 
 function switchView(viewName) {
     currentView = viewName;
-
-    // Update Sidebar
     navItems.forEach(item => {
         if (item.dataset.view === viewName) {
             item.classList.add('active');
@@ -99,14 +85,9 @@ function switchView(viewName) {
             item.classList.remove('active');
         }
     });
-
-    // Update Main Content
     viewContainers.forEach(container => {
         if (container.id === `view-${viewName}`) {
             container.style.display = 'flex';
-            if (viewName === 'builder') {
-                // Trigger resize for layout if needed
-            }
         } else {
             container.style.display = 'none';
         }
@@ -119,20 +100,16 @@ function setupSettings() {
     primaryColorInput.addEventListener('input', (e) => {
         const color = e.target.value;
         primaryColorValue.textContent = color;
-        // Live preview (optional)
         document.documentElement.style.setProperty('--primary-color', color);
     });
 
     saveSettingsBtn.addEventListener('click', () => {
         globalSettings.primaryColor = primaryColorInput.value;
         globalSettings.font = fontSelect.value;
-
-        // Apply Global Styles
         document.documentElement.style.setProperty('--primary-color', globalSettings.primaryColor);
         document.body.style.fontFamily = globalSettings.font === 'serif' ? 'serif' :
             globalSettings.font === 'monospace' ? 'monospace' :
                 "'Inter', sans-serif";
-
         alert('設定を保存しました');
     });
 }
@@ -169,14 +146,11 @@ addArticleBtn.addEventListener('click', () => {
     }
 });
 
-// --- Builder Logic ---
+// --- Builder Logic (Inline Editing) ---
 
 function renderBuilder() {
-    // Clear preview area (except placeholder if empty)
     if (sections.length === 0) {
         previewArea.innerHTML = '<div class="preview-placeholder"><p>左のツールボックスからセクションを追加してください</p></div>';
-        activeSectionId = null;
-        renderBuilderEditor();
         return;
     }
 
@@ -187,7 +161,8 @@ function renderBuilder() {
         sectionEl.className = `preview-section ${section.id === activeSectionId ? 'active' : ''}`;
         sectionEl.onclick = (e) => {
             e.stopPropagation();
-            selectSection(section.id);
+            activeSectionId = section.id;
+            renderBuilder(); // Re-render to show controls
         };
 
         // Render content based on type
@@ -196,9 +171,9 @@ function renderBuilder() {
             case 'header':
                 contentHtml = `
                     <header class="comp-header">
-                        <div class="logo">${escapeHtml(section.data.logoText)}</div>
+                        <div class="logo" contenteditable="true" onblur="updateSectionData('${section.id}', 'logoText', this.innerText)">${escapeHtml(section.data.logoText)}</div>
                         <nav>
-                            ${section.data.links.map(link => `<a href="#">${escapeHtml(link)}</a>`).join('')}
+                            ${section.data.links.map((link, i) => `<a href="#" contenteditable="true" onblur="updateSectionData('${section.id}', 'links.${i}', this.innerText)">${escapeHtml(link)}</a>`).join('')}
                         </nav>
                     </header>
                 `;
@@ -206,9 +181,12 @@ function renderBuilder() {
             case 'hero':
                 contentHtml = `
                     <div class="comp-hero" style="background-image: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('${section.data.imageUrl}')">
-                        <h1>${escapeHtml(section.data.title)}</h1>
-                        <p>${escapeHtml(section.data.subtitle)}</p>
-                        <a href="#" class="cta-button">${escapeHtml(section.data.buttonText)}</a>
+                        <h1 contenteditable="true" onblur="updateSectionData('${section.id}', 'title', this.innerText)">${escapeHtml(section.data.title)}</h1>
+                        <p contenteditable="true" onblur="updateSectionData('${section.id}', 'subtitle', this.innerText)">${escapeHtml(section.data.subtitle)}</p>
+                        <a href="#" class="cta-button" contenteditable="true" onblur="updateSectionData('${section.id}', 'buttonText', this.innerText)">${escapeHtml(section.data.buttonText)}</a>
+                        <div style="margin-top: 1rem;">
+                            <button class="btn secondary" onclick="updateImage('${section.id}', 'imageUrl'); event.stopPropagation();" style="font-size: 0.75rem;">背景画像を変更</button>
+                        </div>
                     </div>
                 `;
                 break;
@@ -216,21 +194,29 @@ function renderBuilder() {
                 contentHtml = `<div class="comp-general">`;
                 section.data.blocks.forEach(block => {
                     contentHtml += `<div class="block-item block-${block.type}">`;
+
+                    // Block Controls
+                    contentHtml += `
+                        <div class="block-controls">
+                            <div class="block-control-btn" onclick="moveBlock('${section.id}', '${block.id}', -1); event.stopPropagation();">↑</div>
+                            <div class="block-control-btn" onclick="moveBlock('${section.id}', '${block.id}', 1); event.stopPropagation();">↓</div>
+                            <div class="block-control-btn" onclick="deleteBlock('${section.id}', '${block.id}'); event.stopPropagation();" style="color: #ef4444;">🗑️</div>
+                        </div>
+                    `;
+
                     if (block.type === 'heading') {
-                        contentHtml += `<h2>${escapeHtml(block.content)}</h2>`;
+                        contentHtml += `<h2 contenteditable="true" onblur="updateBlockData('${section.id}', '${block.id}', this.innerText)">${escapeHtml(block.content)}</h2>`;
                     } else if (block.type === 'text') {
-                        contentHtml += `<p>${escapeHtml(block.content)}</p>`;
+                        contentHtml += `<p contenteditable="true" onblur="updateBlockData('${section.id}', '${block.id}', this.innerText)">${escapeHtml(block.content)}</p>`;
                     } else if (block.type === 'image') {
-                        contentHtml += `<img src="${block.content}" alt="Image">`;
+                        contentHtml += `<img src="${block.content}" alt="Image" class="editable-image" onclick="updateBlockData('${section.id}', '${block.id}', null, true); event.stopPropagation();">`;
                     } else if (block.type === 'table') {
-                        // Simple table mock
                         contentHtml += `
                             <div class="block-table">
                                 <table>
                                     <thead><tr><th>項目</th><th>内容</th></tr></thead>
                                     <tbody>
-                                        <tr><td>サンプル1</td><td>${escapeHtml(block.content)}</td></tr>
-                                        <tr><td>サンプル2</td><td>データ</td></tr>
+                                        <tr><td>サンプル</td><td contenteditable="true" onblur="updateBlockData('${section.id}', '${block.id}', this.innerText)">${escapeHtml(block.content)}</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -238,21 +224,33 @@ function renderBuilder() {
                     }
                     contentHtml += `</div>`;
                 });
+
+                // Add Block Area
+                contentHtml += `
+                    <div class="add-block-area">
+                        <div class="add-block-buttons">
+                            <button class="add-block-btn" onclick="addBlock('${section.id}', 'heading'); event.stopPropagation();"><i data-lucide="heading"></i> 見出し</button>
+                            <button class="add-block-btn" onclick="addBlock('${section.id}', 'text'); event.stopPropagation();"><i data-lucide="type"></i> テキスト</button>
+                            <button class="add-block-btn" onclick="addBlock('${section.id}', 'image'); event.stopPropagation();"><i data-lucide="image"></i> 画像</button>
+                            <button class="add-block-btn" onclick="addBlock('${section.id}', 'table'); event.stopPropagation();"><i data-lucide="table"></i> 表</button>
+                        </div>
+                    </div>
+                `;
                 contentHtml += `</div>`;
                 break;
             case 'footer':
                 contentHtml = `
                     <footer class="comp-footer">
                         <div class="footer-links">
-                            ${section.data.links.map(link => `<a href="#">${escapeHtml(link)}</a>`).join('')}
+                            ${section.data.links.map((link, i) => `<a href="#" contenteditable="true" onblur="updateSectionData('${section.id}', 'links.${i}', this.innerText)">${escapeHtml(link)}</a>`).join('')}
                         </div>
-                        <p>${escapeHtml(section.data.copyright)}</p>
+                        <p contenteditable="true" onblur="updateSectionData('${section.id}', 'copyright', this.innerText)">${escapeHtml(section.data.copyright)}</p>
                     </footer>
                 `;
                 break;
         }
 
-        // Add controls
+        // Section Controls
         const controlsHtml = `
             <div class="section-controls">
                 <div class="control-btn" onclick="moveSection('${section.id}', -1); event.stopPropagation();">↑</div>
@@ -264,159 +262,12 @@ function renderBuilder() {
         sectionEl.innerHTML = controlsHtml + contentHtml;
         previewArea.appendChild(sectionEl);
     });
-}
 
-function renderBuilderEditor() {
-    if (!activeSectionId) {
-        activeSectionName.textContent = '選択なし';
-        editorContent.innerHTML = '<p class="empty-state">プレビューエリアのセクションを選択して編集します。</p>';
-        return;
-    }
-
-    const section = sections.find(s => s.id === activeSectionId);
-    if (!section) return;
-
-    activeSectionName.textContent = getSectionTypeName(section.type);
-    editorContent.innerHTML = '';
-
-    // Generate fields based on type
-    if (section.type === 'header') {
-        createInput('ロゴテキスト', 'logoText', section.data.logoText);
-        createInput('リンク1', 'links.0', section.data.links[0]);
-        createInput('リンク2', 'links.1', section.data.links[1]);
-
-    } else if (section.type === 'hero') {
-        createInput('タイトル', 'title', section.data.title);
-        createTextarea('サブタイトル', 'subtitle', section.data.subtitle);
-        createInput('ボタンテキスト', 'buttonText', section.data.buttonText);
-        createInput('背景画像URL', 'imageUrl', section.data.imageUrl);
-
-    } else if (section.type === 'footer') {
-        createInput('コピーライト', 'copyright', section.data.copyright);
-        createInput('リンク1', 'links.0', section.data.links[0]);
-
-    } else if (section.type === 'general') {
-        // Block Manager UI
-        const manager = document.createElement('div');
-        manager.className = 'block-manager';
-
-        // List Blocks
-        section.data.blocks.forEach((block, index) => {
-            const item = document.createElement('div');
-            item.className = `block-list-item ${activeBlockId === block.id ? 'selected' : ''}`;
-            item.innerHTML = `
-                <span class="block-type-label">${getBlockTypeName(block.type)}</span>
-                <span style="font-size: 0.75rem; color: #9ca3af;">#${index + 1}</span>
-            `;
-            item.onclick = () => {
-                activeBlockId = block.id;
-                renderBuilderEditor(); // Re-render to show block editor
-            };
-            manager.appendChild(item);
-        });
-
-        // Add Block Buttons
-        const buttons = document.createElement('div');
-        buttons.className = 'add-block-buttons';
-        buttons.innerHTML = `
-            <button class="add-block-btn" onclick="addBlock('heading')">+ 見出し</button>
-            <button class="add-block-btn" onclick="addBlock('text')">+ テキスト</button>
-            <button class="add-block-btn" onclick="addBlock('image')">+ 画像</button>
-            <button class="add-block-btn" onclick="addBlock('table')">+ 表</button>
-        `;
-        manager.appendChild(buttons);
-
-        editorContent.appendChild(document.createElement('h4')).textContent = 'ブロック管理';
-        editorContent.appendChild(manager);
-
-        // Block Editor (if selected)
-        if (activeBlockId) {
-            const block = section.data.blocks.find(b => b.id === activeBlockId);
-            if (block) {
-                editorContent.appendChild(document.createElement('hr'));
-                editorContent.appendChild(document.createElement('h4')).textContent = 'ブロック編集';
-
-                if (block.type === 'heading') {
-                    createBlockInput('見出しテキスト', block.id, block.content);
-                } else if (block.type === 'text') {
-                    createBlockTextarea('テキスト内容', block.id, block.content);
-                } else if (block.type === 'image') {
-                    createBlockInput('画像URL', block.id, block.content);
-                } else if (block.type === 'table') {
-                    createBlockInput('セル内容 (サンプル)', block.id, block.content);
-                }
-
-                // Delete Block Button
-                const delBtn = document.createElement('button');
-                delBtn.className = 'btn secondary';
-                delBtn.style.width = '100%';
-                delBtn.style.marginTop = '1rem';
-                delBtn.style.color = '#ef4444';
-                delBtn.style.borderColor = '#ef4444';
-                delBtn.textContent = 'このブロックを削除';
-                delBtn.onclick = () => deleteBlock(block.id);
-                editorContent.appendChild(delBtn);
-            }
-        }
-    }
+    // Re-initialize icons after render
+    lucide.createIcons();
 }
 
 // --- Helper Functions ---
-
-function createInput(label, key, value) {
-    const group = document.createElement('div');
-    group.className = 'form-group';
-    group.innerHTML = `
-        <label>${label}</label>
-        <input type="text" class="form-control" value="${escapeHtml(value || '')}" oninput="updateSectionData('${key}', this.value)">
-    `;
-    editorContent.appendChild(group);
-}
-
-function createTextarea(label, key, value) {
-    const group = document.createElement('div');
-    group.className = 'form-group';
-    group.innerHTML = `
-        <label>${label}</label>
-        <textarea class="form-control" oninput="updateSectionData('${key}', this.value)">${escapeHtml(value || '')}</textarea>
-    `;
-    editorContent.appendChild(group);
-}
-
-function createBlockInput(label, blockId, value) {
-    const group = document.createElement('div');
-    group.className = 'form-group';
-    group.innerHTML = `
-        <label>${label}</label>
-        <input type="text" class="form-control" value="${escapeHtml(value || '')}" oninput="updateBlockData('${blockId}', this.value)">
-    `;
-    editorContent.appendChild(group);
-}
-
-function createBlockTextarea(label, blockId, value) {
-    const group = document.createElement('div');
-    group.className = 'form-group';
-    group.innerHTML = `
-        <label>${label}</label>
-        <textarea class="form-control" oninput="updateBlockData('${blockId}', this.value)">${escapeHtml(value || '')}</textarea>
-    `;
-    editorContent.appendChild(group);
-}
-
-function getSectionTypeName(type) {
-    const map = {
-        header: 'ヘッダー',
-        hero: 'ヒーロー',
-        general: '汎用セクション',
-        footer: 'フッター'
-    };
-    return map[type] || type;
-}
-
-function getBlockTypeName(type) {
-    const map = { heading: '見出し', text: 'テキスト', image: '画像', table: '表' };
-    return map[type] || type;
-}
 
 function escapeHtml(text) {
     if (typeof text !== 'string') return text;
@@ -445,21 +296,15 @@ function addSection(type) {
     }
 
     sections.push({ id: newId, type, data });
-    selectSection(newId);
+    activeSectionId = newId;
+    renderBuilder();
     setTimeout(() => {
         previewArea.scrollTop = previewArea.scrollHeight;
     }, 10);
 }
 
-function selectSection(id) {
-    activeSectionId = id;
-    activeBlockId = null; // Reset block selection
-    renderBuilder();
-    renderBuilderEditor();
-}
-
-function updateSectionData(key, value) {
-    const section = sections.find(s => s.id === activeSectionId);
+function updateSectionData(sectionId, key, value) {
+    const section = sections.find(s => s.id === sectionId);
     if (!section) return;
 
     if (key.includes('.')) {
@@ -470,13 +315,20 @@ function updateSectionData(key, value) {
     } else {
         section.data[key] = value;
     }
+    // No need to re-render for text updates as it's inline
+}
 
-    updatePreviewOnly();
+function updateImage(sectionId, key) {
+    const url = prompt('新しい画像URLを入力してください:');
+    if (url) {
+        updateSectionData(sectionId, key, url);
+        renderBuilder(); // Re-render to show new image
+    }
 }
 
 // Block Actions
-function addBlock(type) {
-    const section = sections.find(s => s.id === activeSectionId);
+function addBlock(sectionId, type) {
+    const section = sections.find(s => s.id === sectionId);
     if (!section || section.type !== 'general') return;
 
     const newBlock = {
@@ -488,45 +340,57 @@ function addBlock(type) {
     };
 
     section.data.blocks.push(newBlock);
-    activeBlockId = newBlock.id;
     renderBuilder();
-    renderBuilderEditor();
 }
 
-function updateBlockData(blockId, value) {
-    const section = sections.find(s => s.id === activeSectionId);
+function updateBlockData(sectionId, blockId, value, isImage = false) {
+    const section = sections.find(s => s.id === sectionId);
     if (!section) return;
 
     const block = section.data.blocks.find(b => b.id === blockId);
     if (block) {
-        block.content = value;
-        updatePreviewOnly();
+        if (isImage) {
+            const url = prompt('新しい画像URLを入力してください:', block.content);
+            if (url) {
+                block.content = url;
+                renderBuilder();
+            }
+        } else {
+            block.content = value;
+        }
     }
 }
 
-function deleteBlock(blockId) {
-    const section = sections.find(s => s.id === activeSectionId);
+function deleteBlock(sectionId, blockId) {
+    if (!confirm('このブロックを削除しますか？')) return;
+    const section = sections.find(s => s.id === sectionId);
     if (!section) return;
 
     section.data.blocks = section.data.blocks.filter(b => b.id !== blockId);
-    activeBlockId = null;
     renderBuilder();
-    renderBuilderEditor();
 }
 
-function updatePreviewOnly() {
-    const currentScroll = previewArea.scrollTop;
+function moveBlock(sectionId, blockId, direction) {
+    const section = sections.find(s => s.id === sectionId);
+    if (!section) return;
+
+    const index = section.data.blocks.findIndex(b => b.id === blockId);
+    if (index === -1) return;
+
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= section.data.blocks.length) return;
+
+    const temp = section.data.blocks[index];
+    section.data.blocks[index] = section.data.blocks[newIndex];
+    section.data.blocks[newIndex] = temp;
+
     renderBuilder();
-    previewArea.scrollTop = currentScroll;
 }
 
 function deleteSection(id) {
     if (!confirm('このセクションを削除しますか？')) return;
     sections = sections.filter(s => s.id !== id);
-    if (activeSectionId === id) {
-        activeSectionId = null;
-        renderBuilderEditor();
-    }
+    if (activeSectionId === id) activeSectionId = null;
     renderBuilder();
 }
 
