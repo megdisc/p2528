@@ -341,8 +341,8 @@ body {
     height: 100%;
     /* Ensure full height for scrolling */
     background-color: #e5e5e5;
-    padding: 4rem 0 8rem;
-    /* Remove horizontal padding, let align-items handle it */
+    padding: 4rem 4rem 8rem;
+    /* Added horizontal padding */
     overflow-y: auto;
     /* Scrollable area */
     display: flex;
@@ -397,7 +397,8 @@ body {
 
 .palette-item i {
     color: inherit;
-    /* Ensure icon takes parent color */
+    stroke: currentColor;
+    /* Force stroke color */
 }
 
 .palette-item:hover {
