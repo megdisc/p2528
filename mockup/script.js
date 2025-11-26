@@ -14,32 +14,32 @@ let cmsArticles = [
     { id: 3, title: '採用情報：エンジニア募集中', status: 'draft', date: '-' }
 ];
 
-// Builder State (Existing)
+// Builder State
 let sections = [
     {
         id: '1',
         type: 'hero',
         data: {
             title: 'あなたのビジネスを加速させる',
-            subtitle: 'ノーコードで美しいWebサイトを数分で構築。エンジニアリングの知識は必要ありません。',
+            subtitle: 'ノーコードで美しいWebサイトを数分で構築。',
             buttonText: '無料で始める',
             imageUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80'
         }
     },
     {
         id: '2',
-        type: 'features',
+        type: 'general',
         data: {
-            title: '主な機能',
-            items: [
-                { icon: '🚀', title: '爆速構築', text: 'ドラッグ＆ドロップで直感的に操作できます。' },
-                { icon: '🎨', title: '美しいデザイン', text: 'プロが作成したテンプレートを使用。' },
-                { icon: '📱', title: 'レスポンシブ', text: 'スマホ・タブレットに自動対応。' }
+            blocks: [
+                { id: 'b1', type: 'heading', content: '主な機能' },
+                { id: 'b2', type: 'text', content: '私たちのプラットフォームは、ビジネスの成長を支援するために設計されています。' },
+                { id: 'b3', type: 'image', content: 'https://via.placeholder.com/800x400' }
             ]
         }
     }
 ];
 let activeSectionId = null;
+let activeBlockId = null; // For block editing
 
 // --- DOM Elements ---
 
@@ -74,6 +74,7 @@ function init() {
     renderCMS();
     renderBuilder();
     renderBuilderEditor();
+    lucide.createIcons();
 }
 
 // --- Navigation Logic ---
@@ -102,7 +103,7 @@ function switchView(viewName) {
     // Update Main Content
     viewContainers.forEach(container => {
         if (container.id === `view-${viewName}`) {
-            container.style.display = 'flex'; // or block depending on layout, flex for builder
+            container.style.display = 'flex';
             if (viewName === 'builder') {
                 // Trigger resize for layout if needed
             }
@@ -168,7 +169,7 @@ addArticleBtn.addEventListener('click', () => {
     }
 });
 
-// --- Builder Logic (Refactored) ---
+// --- Builder Logic ---
 
 function renderBuilder() {
     // Clear preview area (except placeholder if empty)
@@ -192,6 +193,16 @@ function renderBuilder() {
         // Render content based on type
         let contentHtml = '';
         switch (section.type) {
+            case 'header':
+                contentHtml = `
+                    <header class="comp-header">
+                        <div class="logo">${escapeHtml(section.data.logoText)}</div>
+                        <nav>
+                            ${section.data.links.map(link => `<a href="#">${escapeHtml(link)}</a>`).join('')}
+                        </nav>
+                    </header>
+                `;
+                break;
             case 'hero':
                 contentHtml = `
                     <div class="comp-hero" style="background-image: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)), url('${section.data.imageUrl}')">
@@ -201,39 +212,42 @@ function renderBuilder() {
                     </div>
                 `;
                 break;
-            case 'features':
-                contentHtml = `
-                    <div class="comp-features">
-                        <h2>${escapeHtml(section.data.title)}</h2>
-                        <div class="features-grid">
-                            ${section.data.items.map(item => `
-                                <div class="feature-item">
-                                    <span class="feature-icon">${item.icon}</span>
-                                    <h3>${escapeHtml(item.title)}</h3>
-                                    <p>${escapeHtml(item.text)}</p>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
+            case 'general':
+                contentHtml = `<div class="comp-general">`;
+                section.data.blocks.forEach(block => {
+                    contentHtml += `<div class="block-item block-${block.type}">`;
+                    if (block.type === 'heading') {
+                        contentHtml += `<h2>${escapeHtml(block.content)}</h2>`;
+                    } else if (block.type === 'text') {
+                        contentHtml += `<p>${escapeHtml(block.content)}</p>`;
+                    } else if (block.type === 'image') {
+                        contentHtml += `<img src="${block.content}" alt="Image">`;
+                    } else if (block.type === 'table') {
+                        // Simple table mock
+                        contentHtml += `
+                            <div class="block-table">
+                                <table>
+                                    <thead><tr><th>項目</th><th>内容</th></tr></thead>
+                                    <tbody>
+                                        <tr><td>サンプル1</td><td>${escapeHtml(block.content)}</td></tr>
+                                        <tr><td>サンプル2</td><td>データ</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+                    }
+                    contentHtml += `</div>`;
+                });
+                contentHtml += `</div>`;
                 break;
-            case 'text':
+            case 'footer':
                 contentHtml = `
-                    <div class="comp-text">
-                        ${section.data.content}
-                    </div>
-                `;
-                break;
-            case 'form':
-                contentHtml = `
-                    <div class="comp-form">
-                        <div class="form-wrapper">
-                            <h2>${escapeHtml(section.data.title)}</h2>
-                            <div class="dummy-input">お名前</div>
-                            <div class="dummy-input">メールアドレス</div>
-                            <button class="dummy-submit">${escapeHtml(section.data.buttonText)}</button>
+                    <footer class="comp-footer">
+                        <div class="footer-links">
+                            ${section.data.links.map(link => `<a href="#">${escapeHtml(link)}</a>`).join('')}
                         </div>
-                    </div>
+                        <p>${escapeHtml(section.data.copyright)}</p>
+                    </footer>
                 `;
                 break;
         }
@@ -266,43 +280,95 @@ function renderBuilderEditor() {
     editorContent.innerHTML = '';
 
     // Generate fields based on type
-    if (section.type === 'hero') {
+    if (section.type === 'header') {
+        createInput('ロゴテキスト', 'logoText', section.data.logoText);
+        createInput('リンク1', 'links.0', section.data.links[0]);
+        createInput('リンク2', 'links.1', section.data.links[1]);
+
+    } else if (section.type === 'hero') {
         createInput('タイトル', 'title', section.data.title);
         createTextarea('サブタイトル', 'subtitle', section.data.subtitle);
         createInput('ボタンテキスト', 'buttonText', section.data.buttonText);
         createInput('背景画像URL', 'imageUrl', section.data.imageUrl);
-    } else if (section.type === 'features') {
-        createInput('セクションタイトル', 'title', section.data.title);
-        // Simplified editing for features items
-        const item = section.data.items[0];
-        editorContent.appendChild(document.createElement('hr'));
-        const note = document.createElement('p');
-        note.style.fontSize = '0.75rem';
-        note.style.color = '#6b7280';
-        note.style.marginBottom = '1rem';
-        note.textContent = '※MVP版では最初のアイテムのみ編集可能です';
-        editorContent.appendChild(note);
 
-        createInput('アイコン (絵文字)', 'items.0.icon', item.icon);
-        createInput('見出し', 'items.0.title', item.title);
-        createTextarea('説明文', 'items.0.text', item.text);
+    } else if (section.type === 'footer') {
+        createInput('コピーライト', 'copyright', section.data.copyright);
+        createInput('リンク1', 'links.0', section.data.links[0]);
 
-    } else if (section.type === 'text') {
-        createTextarea('本文 (HTML可)', 'content', section.data.content);
-    } else if (section.type === 'form') {
-        createInput('フォームタイトル', 'title', section.data.title);
-        createInput('送信ボタンテキスト', 'buttonText', section.data.buttonText);
+    } else if (section.type === 'general') {
+        // Block Manager UI
+        const manager = document.createElement('div');
+        manager.className = 'block-manager';
+
+        // List Blocks
+        section.data.blocks.forEach((block, index) => {
+            const item = document.createElement('div');
+            item.className = `block-list-item ${activeBlockId === block.id ? 'selected' : ''}`;
+            item.innerHTML = `
+                <span class="block-type-label">${getBlockTypeName(block.type)}</span>
+                <span style="font-size: 0.75rem; color: #9ca3af;">#${index + 1}</span>
+            `;
+            item.onclick = () => {
+                activeBlockId = block.id;
+                renderBuilderEditor(); // Re-render to show block editor
+            };
+            manager.appendChild(item);
+        });
+
+        // Add Block Buttons
+        const buttons = document.createElement('div');
+        buttons.className = 'add-block-buttons';
+        buttons.innerHTML = `
+            <button class="add-block-btn" onclick="addBlock('heading')">+ 見出し</button>
+            <button class="add-block-btn" onclick="addBlock('text')">+ テキスト</button>
+            <button class="add-block-btn" onclick="addBlock('image')">+ 画像</button>
+            <button class="add-block-btn" onclick="addBlock('table')">+ 表</button>
+        `;
+        manager.appendChild(buttons);
+
+        editorContent.appendChild(document.createElement('h4')).textContent = 'ブロック管理';
+        editorContent.appendChild(manager);
+
+        // Block Editor (if selected)
+        if (activeBlockId) {
+            const block = section.data.blocks.find(b => b.id === activeBlockId);
+            if (block) {
+                editorContent.appendChild(document.createElement('hr'));
+                editorContent.appendChild(document.createElement('h4')).textContent = 'ブロック編集';
+
+                if (block.type === 'heading') {
+                    createBlockInput('見出しテキスト', block.id, block.content);
+                } else if (block.type === 'text') {
+                    createBlockTextarea('テキスト内容', block.id, block.content);
+                } else if (block.type === 'image') {
+                    createBlockInput('画像URL', block.id, block.content);
+                } else if (block.type === 'table') {
+                    createBlockInput('セル内容 (サンプル)', block.id, block.content);
+                }
+
+                // Delete Block Button
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn secondary';
+                delBtn.style.width = '100%';
+                delBtn.style.marginTop = '1rem';
+                delBtn.style.color = '#ef4444';
+                delBtn.style.borderColor = '#ef4444';
+                delBtn.textContent = 'このブロックを削除';
+                delBtn.onclick = () => deleteBlock(block.id);
+                editorContent.appendChild(delBtn);
+            }
+        }
     }
 }
 
-// --- Helper Functions (Builder) ---
+// --- Helper Functions ---
 
 function createInput(label, key, value) {
     const group = document.createElement('div');
     group.className = 'form-group';
     group.innerHTML = `
         <label>${label}</label>
-        <input type="text" class="form-control" value="${escapeHtml(value)}" oninput="updateSectionData('${key}', this.value)">
+        <input type="text" class="form-control" value="${escapeHtml(value || '')}" oninput="updateSectionData('${key}', this.value)">
     `;
     editorContent.appendChild(group);
 }
@@ -312,13 +378,43 @@ function createTextarea(label, key, value) {
     group.className = 'form-group';
     group.innerHTML = `
         <label>${label}</label>
-        <textarea class="form-control" oninput="updateSectionData('${key}', this.value)">${escapeHtml(value)}</textarea>
+        <textarea class="form-control" oninput="updateSectionData('${key}', this.value)">${escapeHtml(value || '')}</textarea>
+    `;
+    editorContent.appendChild(group);
+}
+
+function createBlockInput(label, blockId, value) {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    group.innerHTML = `
+        <label>${label}</label>
+        <input type="text" class="form-control" value="${escapeHtml(value || '')}" oninput="updateBlockData('${blockId}', this.value)">
+    `;
+    editorContent.appendChild(group);
+}
+
+function createBlockTextarea(label, blockId, value) {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    group.innerHTML = `
+        <label>${label}</label>
+        <textarea class="form-control" oninput="updateBlockData('${blockId}', this.value)">${escapeHtml(value || '')}</textarea>
     `;
     editorContent.appendChild(group);
 }
 
 function getSectionTypeName(type) {
-    const map = { hero: 'ヒーロー', features: '特徴リスト', text: 'テキスト', form: 'フォーム' };
+    const map = {
+        header: 'ヘッダー',
+        hero: 'ヒーロー',
+        general: '汎用セクション',
+        footer: 'フッター'
+    };
+    return map[type] || type;
+}
+
+function getBlockTypeName(type) {
+    const map = { heading: '見出し', text: 'テキスト', image: '画像', table: '表' };
     return map[type] || type;
 }
 
@@ -332,18 +428,20 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
+// --- Actions ---
+
 function addSection(type) {
     const newId = Date.now().toString();
     let data = {};
 
-    if (type === 'hero') {
+    if (type === 'header') {
+        data = { logoText: 'My Site', links: ['ホーム', '機能', 'お問い合わせ'] };
+    } else if (type === 'hero') {
         data = { title: '新しいヒーロー', subtitle: 'ここにサブタイトルが入ります', buttonText: 'ボタン', imageUrl: '' };
-    } else if (type === 'features') {
-        data = { title: '特徴', items: [{ icon: '★', title: '特徴1', text: '説明文' }] };
-    } else if (type === 'text') {
-        data = { content: '<p>ここにテキストを入力してください。</p>' };
-    } else if (type === 'form') {
-        data = { title: 'お問い合わせ', buttonText: '送信する' };
+    } else if (type === 'general') {
+        data = { blocks: [{ id: Date.now() + 'b', type: 'heading', content: '新しいセクション' }] };
+    } else if (type === 'footer') {
+        data = { copyright: '© 2024 My Company', links: ['利用規約', 'プライバシーポリシー'] };
     }
 
     sections.push({ id: newId, type, data });
@@ -355,6 +453,7 @@ function addSection(type) {
 
 function selectSection(id) {
     activeSectionId = id;
+    activeBlockId = null; // Reset block selection
     renderBuilder();
     renderBuilderEditor();
 }
@@ -365,16 +464,54 @@ function updateSectionData(key, value) {
 
     if (key.includes('.')) {
         const parts = key.split('.');
-        if (parts[0] === 'items') {
-            const index = parseInt(parts[1]);
-            const prop = parts[2];
-            section.data.items[index][prop] = value;
-        }
+        const arrayName = parts[0];
+        const index = parseInt(parts[1]);
+        section.data[arrayName][index] = value;
     } else {
         section.data[key] = value;
     }
 
     updatePreviewOnly();
+}
+
+// Block Actions
+function addBlock(type) {
+    const section = sections.find(s => s.id === activeSectionId);
+    if (!section || section.type !== 'general') return;
+
+    const newBlock = {
+        id: Date.now().toString(),
+        type: type,
+        content: type === 'image' ? 'https://via.placeholder.com/400' :
+            type === 'heading' ? '新しい見出し' :
+                type === 'table' ? 'テーブルデータ' : '新しいテキスト'
+    };
+
+    section.data.blocks.push(newBlock);
+    activeBlockId = newBlock.id;
+    renderBuilder();
+    renderBuilderEditor();
+}
+
+function updateBlockData(blockId, value) {
+    const section = sections.find(s => s.id === activeSectionId);
+    if (!section) return;
+
+    const block = section.data.blocks.find(b => b.id === blockId);
+    if (block) {
+        block.content = value;
+        updatePreviewOnly();
+    }
+}
+
+function deleteBlock(blockId) {
+    const section = sections.find(s => s.id === activeSectionId);
+    if (!section) return;
+
+    section.data.blocks = section.data.blocks.filter(b => b.id !== blockId);
+    activeBlockId = null;
+    renderBuilder();
+    renderBuilderEditor();
 }
 
 function updatePreviewOnly() {
@@ -407,7 +544,7 @@ function moveSection(id, direction) {
     renderBuilder();
 }
 
-// --- Event Listeners (Builder) ---
+// --- Event Listeners ---
 
 toolItems.forEach(item => {
     item.addEventListener('click', () => {

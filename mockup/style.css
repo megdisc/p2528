@@ -83,7 +83,10 @@ body {
 .nav-item .icon {
     margin-right: 0.75rem;
     width: 20px;
-    text-align: center;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sidebar-footer {
@@ -243,10 +246,8 @@ body {
 }
 
 /* --- Builder Specific Styles (Scoped) --- */
-/* We need to adjust the builder layout to fit inside the view container */
 #view-builder {
     padding: 0;
-    /* Remove padding for full-screen feel */
     overflow: hidden;
 }
 
@@ -263,7 +264,6 @@ body {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    /* Actions on right */
     padding: 0 1.5rem;
     flex-shrink: 0;
 }
@@ -343,7 +343,16 @@ body {
 
 .tool-item .icon {
     margin-right: 0.75rem;
-    font-size: 1.25rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-sub);
+}
+
+.tool-item:hover .icon {
+    color: var(--primary-color);
 }
 
 /* Preview Area */
@@ -395,6 +404,7 @@ body {
     padding: 0.25rem;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 20;
 }
 
 .preview-section:hover .section-controls,
@@ -493,7 +503,139 @@ textarea.form-control {
     min-height: 80px;
 }
 
-/* Components */
+/* --- General Section & Blocks --- */
+
+.comp-general {
+    padding: 4rem 2rem;
+    background-color: white;
+}
+
+.block-item {
+    margin-bottom: 1.5rem;
+}
+
+.block-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Block Types */
+.block-heading h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #111827;
+}
+
+.block-text p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.block-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.block-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.block-table th,
+.block-table td {
+    border: 1px solid #e5e7eb;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.block-table th {
+    background-color: #f9fafb;
+    font-weight: 600;
+}
+
+/* Block Editor UI */
+.block-manager {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.5rem;
+    background-color: #f9fafb;
+    margin-bottom: 1rem;
+}
+
+.block-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.block-list-item:hover {
+    border-color: var(--primary-color);
+}
+
+.block-list-item.selected {
+    border-color: var(--primary-color);
+    background-color: #eff6ff;
+}
+
+.block-type-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-sub);
+}
+
+.add-block-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.add-block-btn {
+    padding: 0.5rem;
+    font-size: 0.75rem;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-block-btn:hover {
+    background-color: var(--bg-color);
+    border-color: var(--text-sub);
+}
+
+/* --- Legacy Sections (Header/Footer/Hero) --- */
+
+.comp-header {
+    padding: 1rem 2rem;
+    background-color: white;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.comp-header .logo {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #111827;
+}
+
+.comp-header nav a {
+    margin-left: 1.5rem;
+    text-decoration: none;
+    color: #4b5563;
+    font-weight: 500;
+}
+
 .comp-hero {
     padding: 4rem 2rem;
     text-align: center;
@@ -527,84 +669,24 @@ textarea.form-control {
     font-weight: 500;
 }
 
-.comp-features {
-    padding: 4rem 2rem;
-    background-color: white;
-}
-
-.comp-features h2 {
-    text-align: center;
-    margin-bottom: 3rem;
-    font-size: 2rem;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 2rem;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.feature-item {
-    text-align: center;
-    padding: 1.5rem;
-    border: 1px solid #f3f4f6;
-    border-radius: 8px;
-}
-
-.feature-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    display: block;
-}
-
-.feature-item h3 {
-    margin-bottom: 0.5rem;
-    font-size: 1.25rem;
-}
-
-.comp-text {
+.comp-footer {
     padding: 3rem 2rem;
-    max-width: 800px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-
-.comp-form {
-    padding: 4rem 2rem;
-    background-color: #f9fafb;
-}
-
-.form-wrapper {
-    max-width: 500px;
-    margin: 0 auto;
-    background: white;
-    padding: 2rem;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.comp-form h2 {
-    margin-bottom: 1.5rem;
+    background-color: #1f2937;
+    color: white;
     text-align: center;
 }
 
-.dummy-input {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    background-color: #f9fafb;
+.comp-footer .footer-links {
+    margin-bottom: 1.5rem;
 }
 
-.dummy-submit {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #111827;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    font-weight: 600;
+.comp-footer .footer-links a {
+    color: #9ca3af;
+    text-decoration: none;
+    margin: 0 1rem;
+}
+
+.comp-footer p {
+    color: #6b7280;
+    font-size: 0.875rem;
 }

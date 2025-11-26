@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SiteBuilder Pro - Production Mockup</title>
+    <title>函 - Production Mockup</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
@@ -14,20 +15,20 @@
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
             <div class="sidebar-header">
-                <div class="logo">SiteBuilder Pro</div>
+                <div class="logo">函</div>
             </div>
             <ul class="nav-links">
                 <li class="nav-item active" data-view="dashboard">
-                    <span class="icon">📊</span> ダッシュボード
+                    <span class="icon"><i data-lucide="layout-dashboard"></i></span> ダッシュボード
                 </li>
                 <li class="nav-item" data-view="builder">
-                    <span class="icon">🎨</span> サイトビルダー
+                    <span class="icon"><i data-lucide="palette"></i></span> サイトビルダー
                 </li>
                 <li class="nav-item" data-view="cms">
-                    <span class="icon">📝</span> CMS / ブログ
+                    <span class="icon"><i data-lucide="file-text"></i></span> CMS / ブログ
                 </li>
                 <li class="nav-item" data-view="settings">
-                    <span class="icon">⚙️</span> グローバル設定
+                    <span class="icon"><i data-lucide="settings"></i></span> グローバル設定
                 </li>
             </ul>
             <div class="sidebar-footer">
@@ -68,7 +69,7 @@
                 </div>
             </div>
 
-            <!-- View: Builder (Original Mockup Content) -->
+            <!-- View: Builder -->
             <div id="view-builder" class="view-container" style="display: none;">
                 <div class="builder-layout">
                     <header class="builder-header">
@@ -81,17 +82,17 @@
                         <!-- Sidebar / Toolbox -->
                         <aside class="toolbox">
                             <h3>セクション追加</h3>
+                            <div class="tool-item" data-type="header">
+                                <span class="icon"><i data-lucide="navigation"></i></span> ヘッダー
+                            </div>
                             <div class="tool-item" data-type="hero">
-                                <span class="icon">🖼️</span> ヒーロー
+                                <span class="icon"><i data-lucide="image"></i></span> ヒーロー
                             </div>
-                            <div class="tool-item" data-type="features">
-                                <span class="icon">✨</span> 特徴リスト
+                            <div class="tool-item" data-type="general">
+                                <span class="icon"><i data-lucide="box"></i></span> 汎用セクション
                             </div>
-                            <div class="tool-item" data-type="text">
-                                <span class="icon">📝</span> テキスト
-                            </div>
-                            <div class="tool-item" data-type="form">
-                                <span class="icon">✉️</span> フォーム
+                            <div class="tool-item" data-type="footer">
+                                <span class="icon"><i data-lucide="footprints"></i></span> フッター
                             </div>
                         </aside>
 
